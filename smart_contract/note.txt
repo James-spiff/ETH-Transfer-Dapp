@@ -1,0 +1,1 @@
+npm init -y     //initializes an empty package.json
