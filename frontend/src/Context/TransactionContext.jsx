@@ -145,4 +145,4 @@ export const TransactionProvider = ({ children }) => {
             {children}
         </TransactionContext.Provider>
     )
-} //This is a context provider we use this in main.jsx and it let's the entire application access the values, states or props passed into it
+} //This is a context provider we use this in main.jsx and it let's the entire application access the values, states or props passed into it //
