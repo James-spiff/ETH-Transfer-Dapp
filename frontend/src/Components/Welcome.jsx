@@ -1,8 +1,12 @@
+import React, { useContext } from 'react';
 import { AiFillAmazonCircle } from "react-icons/ai";
 import { SiEthereum } from "react-icons/si";
 import { BsInfoCircle } from "react-icons/bs";
 
 import { Loader } from './';
+import { TransactionContext } from "../Context/TransactionContext";
+
+import { shortenAddress } from '../utils/shortenAddress';
 
 const commonStyles = "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white";  //when used inside a grid div it gives us the grid cell with white borders below the connect wallet button
 
@@ -19,13 +23,18 @@ const Input = ({placeholder, name, type, value, handleChange}) => (
 
 const Welcome = () => {
 
-  const connectWallet = () => {
-    console.log("wallet connected")
-  }
+  const { connectWallet, currentAccount, formData, sendTransaction, handleChange, isLoading } = useContext(TransactionContext); //uses the functions and states created in the TransactionContext contextProvider
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    const { addressTo, amount, keyword, message } = formData;
+    e.preventDefault(); //prevents the page from reloading when a form has been submitted
 
-  }
+    if (!addressTo || !amount || !keyword || !message) return;
+
+    sendTransaction(); //if the above statement is false send our transaction
+
+  } //handles the data passed when you submit a form
+
     //mf used below isn't a default tailwind css class but was custom made and appended to it in tailwind.config.js
   return (
     <div className="flex w-full justify center items-center">
@@ -37,13 +46,15 @@ const Welcome = () => {
           <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
             Explore the crypto world. Buy and sell currencies easily on 
           </p>
-          <button
-            type="button"
-            onClick={connectWallet}
-            className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
-          >
+          {!currentAccount && (
+            <button
+              type="button"
+              onClick={connectWallet}
+              className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
+            >
             <p className="text-white text-base font-semibold">Connect Wallet</p>
           </button>
+          )}  {/* displays the button if no account has been connected */}
 
           <div className="grid sm:grid-cols-3 grid-cols-2 w-full mt-10">
             <div className={`rounded-tl-2xl ${commonStyles}`}>
@@ -76,7 +87,7 @@ const Welcome = () => {
               </div>  {/* reps the information icon on the right of the card */}
               <div>
                 <p className="text-white font-light text-sm">
-                  0xadjkn.....ds45hn
+                  {shortenAddress(currentAccount)}
                 </p>
                 <p className="text-white font-semibold text-lg mt-1">
                   Ethereum
@@ -86,14 +97,14 @@ const Welcome = () => {
           </div>
 
           <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
-            <Input placeholder="Address To" name="addressTo" type="text" handleChange={() => {}} />
-            <Input placeholder="Amount (ETH)" name="amount" type="number" handleChange={() => {}} />
-            <Input placeholder="Keyword (GIF)" name="keyword" type="text" handleChange={() => {}} />
-            <Input placeholder="Enter Message" name="message" type="text" handleChange={() => {}} />
+            <Input placeholder="Address To" name="addressTo" type="text" handleChange={handleChange} />
+            <Input placeholder="Amount (ETH)" name="amount" type="number" handleChange={handleChange} />
+            <Input placeholder="Keyword (GIF)" name="keyword" type="text" handleChange={handleChange} />
+            <Input placeholder="Enter Message" name="message" type="text" handleChange={handleChange} />
 
             <div className="h-[1px] w-full bg-gray-400 my-2" /> {/* creates a long line underneat the form */}
 
-            {false ? (
+            {isLoading ? (
               <Loader />
             ) : (
               <button
